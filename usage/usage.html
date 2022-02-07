@@ -176,13 +176,11 @@ They can then end their session by clicking the <code>Log out</code> button and 
 <p>The OpenID Foundation hosts a OpenID Connect Playground where one can test logging in through an OIDC provider: https://openidconnect.net/</p>
 <h3 id="step-1-add-the-client-to-the-server-config"><a class="header" href="#step-1-add-the-client-to-the-server-config">Step 1: Add the client to the server config</a></h3>
 <p>Add the following section to the server configuration file <code>config.yaml</code>:</p>
-<pre><code class="language-yaml">oauth2:
-  # ...
-  clients:
-    - client_id: oidc-playground
-      client_secret: verysecret
-      redirect_uris:
-        - &quot;https://openidconnect.net/callback&quot;
+<pre><code class="language-yaml">clients:
+  - client_id: oidc-playground
+    client_secret: verysecret
+    redirect_uris:
+      - &quot;https://openidconnect.net/callback&quot;
 </code></pre>
 <h3 id="step-2-change-the-playground-configuration"><a class="header" href="#step-2-change-the-playground-configuration">Step 2: Change the playground configuration</a></h3>
 <ul>

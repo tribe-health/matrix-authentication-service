@@ -238,10 +238,12 @@ Check the next section to know about each section.</p>
 database:
   uri: postgresql:///matrix_auth
 
-cookies:
-  secret: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
+http:
+  public_base: http://localhost:8080
 
-oauth2:
+secrets:
+  encryption: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
+
   keys:
     - type: rsa
       key: |
@@ -283,15 +285,16 @@ oauth2:
 </code></pre>
 <h2 id="configuration-sections"><a class="header" href="#configuration-sections">Configuration sections</a></h2>
 <h3 id="http"><a class="header" href="#http"><code>http</code></a></h3>
-<p>Controls on what address the server should be listening on</p>
+<p>Controls the web server.</p>
 <pre><code class="language-yaml">http:
+  # On what address and port the server should listen to
   address: 0.0.0.0:8080
-</code></pre>
-<h3 id="cookies"><a class="header" href="#cookies"><code>cookies</code></a></h3>
-<p>Configuration related to encrypted cookies</p>
-<pre><code class="language-yaml">cookies:
-  # Secret key used to encrypt cookies
-  secret: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
+
+  # Path from which to serve static files
+  web_root: /var/www/static
+
+  # Public URL base used when building absolute public URLs
+  public_base: http://localhost:8080
 </code></pre>
 <h3 id="database"><a class="header" href="#database"><code>database</code></a></h3>
 <p>Configure how to connect to the PostgreSQL database.</p>
@@ -326,22 +329,25 @@ oauth2:
   # Whether builtin should be loaded or not
   builtin: true
 </code></pre>
-<h3 id="oauth2"><a class="header" href="#oauth2"><code>oauth2</code></a></h3>
-<p>Configuration related to the OAuth 2.0 endpoints</p>
-<pre><code class="language-yaml">oauth2:
-  # URL where the server should be accessed
-  issuer: http://localhost:8080/
-
-  # List of OAuth 2.0 clients
-  clients:
-    # Confidential client
-    - client_id: first
-      client_secret: secret
-      # List of authorized redirect URIs
-      redirect_uris:
-        - http://localhost:1234/callback
-    # Public client, without client_secret
-    - client_id: second
+<h3 id="clients"><a class="header" href="#clients"><code>clients</code></a></h3>
+<p>List of OAuth 2.0/OIDC clients and their keys/secrets.</p>
+<pre><code class="language-yaml">clients:
+  # Confidential client
+  - client_id: first
+    client_auth_method: clent_secret_post
+    client_secret: secret
+    # List of authorized redirect URIs
+    redirect_uris:
+      - http://localhost:1234/callback
+  # Public client
+  - client_id: second
+    client_auth_method: none
+</code></pre>
+<h3 id="secrets"><a class="header" href="#secrets"><code>secrets</code></a></h3>
+<p>Signing and encryption secrets</p>
+<pre><code class="language-yaml">secrets:
+  # Encrytion secret (used for encrypting cookies)
+  encryption: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
 
   # Signing keys
   keys:
@@ -411,13 +417,11 @@ They can then end their session by clicking the <code>Log out</code> button and 
 <p>The OpenID Foundation hosts a OpenID Connect Playground where one can test logging in through an OIDC provider: https://openidconnect.net/</p>
 <h3 id="step-1-add-the-client-to-the-server-config"><a class="header" href="#step-1-add-the-client-to-the-server-config">Step 1: Add the client to the server config</a></h3>
 <p>Add the following section to the server configuration file <code>config.yaml</code>:</p>
-<pre><code class="language-yaml">oauth2:
-  # ...
-  clients:
-    - client_id: oidc-playground
-      client_secret: verysecret
-      redirect_uris:
-        - &quot;https://openidconnect.net/callback&quot;
+<pre><code class="language-yaml">clients:
+  - client_id: oidc-playground
+    client_secret: verysecret
+    redirect_uris:
+      - &quot;https://openidconnect.net/callback&quot;
 </code></pre>
 <h3 id="step-2-change-the-playground-configuration"><a class="header" href="#step-2-change-the-playground-configuration">Step 2: Change the playground configuration</a></h3>
 <ul>
@@ -477,12 +481,12 @@ INFO mas_cli::config: Configuration file looks good path=[&quot;config.yaml&quot
 <p>Dump the merged configuration tree.</p>
 <pre><code class="language-console">$ mas-cli config dump --config=first.yaml --config=second.yaml
 ---
-oauth2:
+clients:
   # ...
 </code></pre>
 <h2 id="config-generate"><a class="header" href="#config-generate"><code>config generate</code></a></h2>
 <p>Generate a sample configuration file.
-It generates random signing keys (<code>.oauth2.keys</code>) and the cookie encryption secret (<code>.cookies.secret</code>).</p>
+It generates random signing keys (<code>.secrets.keys</code>) and the cookie encryption secret (<code>.secrets.encryption</code>).</p>
 <pre><code class="language-console">$ mas-cli config generate &gt; config.yaml
 INFO generate: mas_config::oauth2: Generating keys...
 INFO generate:rsa: mas_config::oauth2: Done generating RSA key
@@ -501,6 +505,8 @@ INFO generate:ecdsa: mas_config::oauth2: Done generating ECDSA key
 <pre><code class="language-console">$ mas-cli manage register johndoe hunter2
 INFO mas_cli::manage: User registered user=User { id: 2, username: &quot;johndoe&quot; }
 </code></pre>
+<h2 id="manage-verify-email-username-email"><a class="header" href="#manage-verify-email-username-email"><code>manage verify-email &lt;username&gt; &lt;email&gt;</code></a></h2>
+<p>Mark a user email address as verified</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="server"><a class="header" href="#server"><code>server</code></a></h1>
 <p>Runs the authentication service.</p>
 <pre><code>$ mas-cli server
@@ -542,10 +548,19 @@ It is also meant to stay lightweight in terms of resource usage and easily scala
 <p>The whole repository is a <a href="https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html">Cargo Workspace</a> that includes multiple crates under the <code>/crates</code> directory.</p>
 <p>This includes:</p>
 <ul>
-<li><code>oauth2-types</code>: Useful structures and types to deal with OAuth 2.0/OpenID Connect endpoints. This might end up published as a standalone library as it can be useful in other contexts.</li>
-<li><code>mas-config</code>: Configuration parsing and loading</li>
-<li><code>mas-core</code>: Main logic, includes templates, database interactions and HTTP routes</li>
 <li><code>mas-cli</code>: Command line utility, main entry point</li>
+<li><code>mas-config</code>: Configuration parsing and loading</li>
+<li><code>mas-data-model</code>: Models of objects that live in the database, regardless of the storage backend</li>
+<li><code>mas-email</code>: High-level email sending abstraction</li>
+<li><code>mas-handlers</code>: Main HTTP application logic</li>
+<li><code>mas-iana</code>: Auto-generated enums from IANA registries</li>
+<li><code>mas-iana-codegen</code>: Code generator for the <code>mas-iana</code> crate</li>
+<li><code>mas-jose</code>: JWT/JWS/JWE/JWK abstraction</li>
+<li><code>mas-static-files</code>: Frontend static files (CSS/JS). Includes some frontend tooling</li>
+<li><code>mas-storage</code>: Interactions with the database</li>
+<li><code>mas-tasks</code>: Asynchronous task runner and scheduler</li>
+<li><code>mas-warp-utils</code>: Various filters and utilities for the <code>warp</code> web framework</li>
+<li><code>oauth2-types</code>: Useful structures and types to deal with OAuth 2.0/OpenID Connect endpoints. This might end up published as a standalone library as it can be useful in other contexts.</li>
 </ul>
 <h2 id="important-crates"><a class="header" href="#important-crates">Important crates</a></h2>
 <p>The project makes use of a few important crates.</p>
@@ -606,13 +621,13 @@ Usually it does so by having the database available at compile time, but to avoi
 <pre><code class="language-sh"># Install the CLI
 cargo install sqlx-cli --no-default-features --features postgres
 
-cd crates/core/ # Must be in the mas-core crate folder
+cd crates/storage/ # Must be in the mas-storage crate folder
 export DATABASE_URL=postgresql:///matrix_auth
 cargo sqlx prepare
 </code></pre>
 <h2 id="migrations"><a class="header" href="#migrations">Migrations</a></h2>
 <p>Migration files live in the <code>migrations</code> folder in the <code>mas-core</code> crate.</p>
-<pre><code class="language-sh">cd crates/core/ # Again, in the mas-core crate folder
+<pre><code class="language-sh">cd crates/storage/ # Again, in the mas-storage crate folder
 export DATABASE_URL=postgresql:///matrix_auth
 cargo sqlx migrate run # Run pending migrations
 cargo sqlx migrate revert # Revert the last migration
@@ -682,6 +697,7 @@ This allows us to use this function from either a simple connection or from an a
 <span class="boring">}
 </span></code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="warp"><a class="header" href="#warp"><code>warp</code></a></h1>
+<p><strong>Warning: this document is not up to date</strong></p>
 <p>Warp has a pretty unique approach in terms of routing.
 It does not have a central router, rather a chain of filters composed together.</p>
 <p>It encourages writing reusable filters to handle stuff like authentication, extracting user sessions, starting database transactions, etc.</p>

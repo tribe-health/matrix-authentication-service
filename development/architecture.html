@@ -156,10 +156,19 @@ It is also meant to stay lightweight in terms of resource usage and easily scala
 <p>The whole repository is a <a href="https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html">Cargo Workspace</a> that includes multiple crates under the <code>/crates</code> directory.</p>
 <p>This includes:</p>
 <ul>
-<li><code>oauth2-types</code>: Useful structures and types to deal with OAuth 2.0/OpenID Connect endpoints. This might end up published as a standalone library as it can be useful in other contexts.</li>
-<li><code>mas-config</code>: Configuration parsing and loading</li>
-<li><code>mas-core</code>: Main logic, includes templates, database interactions and HTTP routes</li>
 <li><code>mas-cli</code>: Command line utility, main entry point</li>
+<li><code>mas-config</code>: Configuration parsing and loading</li>
+<li><code>mas-data-model</code>: Models of objects that live in the database, regardless of the storage backend</li>
+<li><code>mas-email</code>: High-level email sending abstraction</li>
+<li><code>mas-handlers</code>: Main HTTP application logic</li>
+<li><code>mas-iana</code>: Auto-generated enums from IANA registries</li>
+<li><code>mas-iana-codegen</code>: Code generator for the <code>mas-iana</code> crate</li>
+<li><code>mas-jose</code>: JWT/JWS/JWE/JWK abstraction</li>
+<li><code>mas-static-files</code>: Frontend static files (CSS/JS). Includes some frontend tooling</li>
+<li><code>mas-storage</code>: Interactions with the database</li>
+<li><code>mas-tasks</code>: Asynchronous task runner and scheduler</li>
+<li><code>mas-warp-utils</code>: Various filters and utilities for the <code>warp</code> web framework</li>
+<li><code>oauth2-types</code>: Useful structures and types to deal with OAuth 2.0/OpenID Connect endpoints. This might end up published as a standalone library as it can be useful in other contexts.</li>
 </ul>
 <h2 id="important-crates"><a class="header" href="#important-crates">Important crates</a></h2>
 <p>The project makes use of a few important crates.</p>

@@ -160,12 +160,12 @@ INFO mas_cli::config: Configuration file looks good path=[&quot;config.yaml&quot
 <p>Dump the merged configuration tree.</p>
 <pre><code class="language-console">$ mas-cli config dump --config=first.yaml --config=second.yaml
 ---
-oauth2:
+clients:
   # ...
 </code></pre>
 <h2 id="config-generate"><a class="header" href="#config-generate"><code>config generate</code></a></h2>
 <p>Generate a sample configuration file.
-It generates random signing keys (<code>.oauth2.keys</code>) and the cookie encryption secret (<code>.cookies.secret</code>).</p>
+It generates random signing keys (<code>.secrets.keys</code>) and the cookie encryption secret (<code>.secrets.encryption</code>).</p>
 <pre><code class="language-console">$ mas-cli config generate &gt; config.yaml
 INFO generate: mas_config::oauth2: Generating keys...
 INFO generate:rsa: mas_config::oauth2: Done generating RSA key

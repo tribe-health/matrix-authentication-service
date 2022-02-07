@@ -182,10 +182,12 @@ Check the next section to know about each section.</p>
 database:
   uri: postgresql:///matrix_auth
 
-cookies:
-  secret: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
+http:
+  public_base: http://localhost:8080
 
-oauth2:
+secrets:
+  encryption: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
+
   keys:
     - type: rsa
       key: |
@@ -227,15 +229,16 @@ oauth2:
 </code></pre>
 <h2 id="configuration-sections"><a class="header" href="#configuration-sections">Configuration sections</a></h2>
 <h3 id="http"><a class="header" href="#http"><code>http</code></a></h3>
-<p>Controls on what address the server should be listening on</p>
+<p>Controls the web server.</p>
 <pre><code class="language-yaml">http:
+  # On what address and port the server should listen to
   address: 0.0.0.0:8080
-</code></pre>
-<h3 id="cookies"><a class="header" href="#cookies"><code>cookies</code></a></h3>
-<p>Configuration related to encrypted cookies</p>
-<pre><code class="language-yaml">cookies:
-  # Secret key used to encrypt cookies
-  secret: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
+
+  # Path from which to serve static files
+  web_root: /var/www/static
+
+  # Public URL base used when building absolute public URLs
+  public_base: http://localhost:8080
 </code></pre>
 <h3 id="database"><a class="header" href="#database"><code>database</code></a></h3>
 <p>Configure how to connect to the PostgreSQL database.</p>
@@ -270,22 +273,25 @@ oauth2:
   # Whether builtin should be loaded or not
   builtin: true
 </code></pre>
-<h3 id="oauth2"><a class="header" href="#oauth2"><code>oauth2</code></a></h3>
-<p>Configuration related to the OAuth 2.0 endpoints</p>
-<pre><code class="language-yaml">oauth2:
-  # URL where the server should be accessed
-  issuer: http://localhost:8080/
-
-  # List of OAuth 2.0 clients
-  clients:
-    # Confidential client
-    - client_id: first
-      client_secret: secret
-      # List of authorized redirect URIs
-      redirect_uris:
-        - http://localhost:1234/callback
-    # Public client, without client_secret
-    - client_id: second
+<h3 id="clients"><a class="header" href="#clients"><code>clients</code></a></h3>
+<p>List of OAuth 2.0/OIDC clients and their keys/secrets.</p>
+<pre><code class="language-yaml">clients:
+  # Confidential client
+  - client_id: first
+    client_auth_method: clent_secret_post
+    client_secret: secret
+    # List of authorized redirect URIs
+    redirect_uris:
+      - http://localhost:1234/callback
+  # Public client
+  - client_id: second
+    client_auth_method: none
+</code></pre>
+<h3 id="secrets"><a class="header" href="#secrets"><code>secrets</code></a></h3>
+<p>Signing and encryption secrets</p>
+<pre><code class="language-yaml">secrets:
+  # Encrytion secret (used for encrypting cookies)
+  encryption: c7e42fb8baba8f228b2e169fdf4c8216dffd5d33ad18bafd8b928c09ca46c718
 
   # Signing keys
   keys:
