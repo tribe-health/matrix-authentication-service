@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><li class="part-title">Introduction</li><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> About this documentation</a></li><li class="chapter-item expanded affix "><li class="part-title">Usage</li><li class="chapter-item expanded "><a href="usage/installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded "><a href="usage/configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="usage/usage.html"><strong aria-hidden="true">4.</strong> Using the service</a></li><li class="chapter-item expanded "><a href="usage/cli/index.html"><strong aria-hidden="true">5.</strong> Command line tool</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/cli/config.html"><strong aria-hidden="true">5.1.</strong> config</a></li><li class="chapter-item expanded "><a href="usage/cli/database.html"><strong aria-hidden="true">5.2.</strong> database</a></li><li class="chapter-item expanded "><a href="usage/cli/manage.html"><strong aria-hidden="true">5.3.</strong> manage</a></li><li class="chapter-item expanded "><a href="usage/cli/server.html"><strong aria-hidden="true">5.4.</strong> server</a></li><li class="chapter-item expanded "><a href="usage/cli/templates.html"><strong aria-hidden="true">5.5.</strong> templates</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Development</li><li class="chapter-item expanded "><a href="development/architecture.html"><strong aria-hidden="true">6.</strong> Architecture</a></li><li class="chapter-item expanded "><a href="development/database.html"><strong aria-hidden="true">7.</strong> Database</a></li><li class="chapter-item expanded "><a href="development/warp.html"><strong aria-hidden="true">8.</strong> Routing with warp</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">9.</strong> Templates</div></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><li class="part-title">Introduction</li><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> About this documentation</a></li><li class="chapter-item expanded affix "><li class="part-title">Usage</li><li class="chapter-item expanded "><a href="usage/installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded "><a href="usage/configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="usage/usage.html"><strong aria-hidden="true">4.</strong> Using the service</a></li><li class="chapter-item expanded "><a href="usage/cli/index.html"><strong aria-hidden="true">5.</strong> Command line tool</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/cli/config.html"><strong aria-hidden="true">5.1.</strong> config</a></li><li class="chapter-item expanded "><a href="usage/cli/database.html"><strong aria-hidden="true">5.2.</strong> database</a></li><li class="chapter-item expanded "><a href="usage/cli/manage.html"><strong aria-hidden="true">5.3.</strong> manage</a></li><li class="chapter-item expanded "><a href="usage/cli/server.html"><strong aria-hidden="true">5.4.</strong> server</a></li><li class="chapter-item expanded "><a href="usage/cli/templates.html"><strong aria-hidden="true">5.5.</strong> templates</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Development</li><li class="chapter-item expanded "><a href="development/architecture.html"><strong aria-hidden="true">6.</strong> Architecture</a></li><li class="chapter-item expanded "><a href="development/database.html"><strong aria-hidden="true">7.</strong> Database</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">8.</strong> Routing with axum</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">9.</strong> Templates</div></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -559,7 +559,6 @@ It is also meant to stay lightweight in terms of resource usage and easily scala
 <li><code>mas-static-files</code>: Frontend static files (CSS/JS). Includes some frontend tooling</li>
 <li><code>mas-storage</code>: Interactions with the database</li>
 <li><code>mas-tasks</code>: Asynchronous task runner and scheduler</li>
-<li><code>mas-warp-utils</code>: Various filters and utilities for the <code>warp</code> web framework</li>
 <li><code>oauth2-types</code>: Useful structures and types to deal with OAuth 2.0/OpenID Connect endpoints. This might end up published as a standalone library as it can be useful in other contexts.</li>
 </ul>
 <h2 id="important-crates"><a class="header" href="#important-crates">Important crates</a></h2>
@@ -600,9 +599,6 @@ It allows for quickly adding additional context around an error while it is bein
 <h3 id="database-interactions-sqlx"><a class="header" href="#database-interactions-sqlx">Database interactions: <code>sqlx</code></a></h3>
 <p>Interactions with the database are done through <a href="https://github.com/launchbadge/sqlx"><code>sqlx</code></a>, an async, pure-Rust SQL library with compile-time check of queries.
 It also handles schema migrations.</p>
-<h3 id="web-framework-warp"><a class="header" href="#web-framework-warp">Web framework: <code>warp</code></a></h3>
-<p><a href="https://docs.rs/warp/*/warp/"><code>warp</code></a> is an easy, macro-free web framework.
-Its composability makes a lot of sense when implementing OAuth 2.0 endpoints, because of the need to deal with a lot of different scenarios.</p>
 <h3 id="templates-tera"><a class="header" href="#templates-tera">Templates: <code>tera</code></a></h3>
 <p><a href="https://tera.netlify.app/">Tera</a> was chosen as template engine for its simplicity as well as its ability to load templates at runtime.
 The builtin templates are embedded in the final binary through some macro magic.</p>
@@ -693,109 +689,6 @@ This allows us to use this function from either a simple connection or from an a
     // Commit the transaction once everything went fine
     txn.commit().await.context(&quot;could not commit transaction&quot;)?;
     Ok(session)
-}
-<span class="boring">}
-</span></code></pre></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="warp"><a class="header" href="#warp"><code>warp</code></a></h1>
-<p><strong>Warning: this document is not up to date</strong></p>
-<p>Warp has a pretty unique approach in terms of routing.
-It does not have a central router, rather a chain of filters composed together.</p>
-<p>It encourages writing reusable filters to handle stuff like authentication, extracting user sessions, starting database transactions, etc.</p>
-<p>Everything related to <code>warp</code> currently lives in the <code>mas-core</code> crate:</p>
-<ul>
-<li><code>crates/core/src/</code>
-<ul>
-<li><code>handlers/</code>: The actual handlers for each route
-<ul>
-<li><code>oauth2/</code>: Everything related to OAuth 2.0/OIDC endpoints</li>
-<li><code>views/</code>: HTML views (login, registration, account management, etc.)</li>
-</ul>
-</li>
-<li><code>filters/</code>: Reusable, composable filters</li>
-<li><code>reply/</code>: Composable replies</li>
-</ul>
-</li>
-</ul>
-<h2 id="defining-a-new-endpoint"><a class="header" href="#defining-a-new-endpoint">Defining a new endpoint</a></h2>
-<p>We usually keep one endpoint per file and use module roots to combine the filters of endpoints.</p>
-<p>This is how it looks like in the current hierarchy at time of writing:</p>
-<ul>
-<li><code>mod.rs</code>: combines the filters from <code>oauth2</code>, <code>views</code> and <code>health</code></li>
-<li><code>oauth2/</code>
-<ul>
-<li><code>mod.rs</code>: combines filters from <code>authorization</code>, <code>discovery</code>, etc.</li>
-<li><code>authorization.rs</code>: handles <code>GET /oauth2/authorize</code> and <code>GET /oauth2/authorize/step</code></li>
-<li><code>discovery.rs</code>: handles <code>GET /.well-known/openid-configuration</code></li>
-<li>...</li>
-</ul>
-</li>
-<li><code>views/</code>
-<ul>
-<li><code>mod.rs</code>: combines the filters from <code>index</code>, <code>login</code>, <code>logout</code>, etc.</li>
-<li><code>index.rs</code>: handles <code>GET /</code></li>
-<li><code>login.rs</code>: handles <code>GET /login</code> and <code>POST /login</code></li>
-<li><code>logout.rs</code>: handles <code>POST /logout</code></li>
-<li>...</li>
-</ul>
-</li>
-<li><code>health.rs</code>: handles <code>GET /health</code></li>
-</ul>
-<p>All filters are functions that take their dependencies (the database connection pool, the template engine, etc.) as parameters and return an <code>impl warp::Filter&lt;Extract = (impl warp::Reply,)&gt;</code>.</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// crates/core/src/handlers/hello.rs
-
-// Don't be scared by the type at the end, just copy-paste it
-pub(super) fn filter(
-    pool: &amp;PgPool,
-    templates: &amp;Templates,
-    cookies_config: &amp;CookiesConfig,
-) -&gt; impl Filter&lt;Extract = (impl Reply,), Error = Rejection&gt; + Clone + Send + Sync + 'static {
-    // Handles `GET /hello/:param`
-    warp::path!(&quot;hello&quot; / String)
-        .and(warp::get())
-        // Pass the template engine
-        .and(with_templates(templates))
-        // Extract the current user session
-        .and(optional_session(pool, cookies_config))
-        .and_then(get)
-}
-
-async fn get(
-    // Parameter from the route
-    parameter: String,
-    // Template engine
-    templates: Templates,
-    // The current user session
-    session: Option&lt;SessionInfo&gt;,
-) -&gt; Result&lt;impl Reply, Rejection&gt; {
-    let ctx = SomeTemplateContext::new(parameter)
-        .maybe_with_session(session);
-
-    let content = templates.render_something(&amp;ctx)?;
-    let reply = html(content);
-    Ok(reply)
-}
-<span class="boring">}
-</span></code></pre></pre>
-<p>And then, it can be attached to the root handler:</p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// crates/core/src/handlers/mod.rs
-
-use self::{health::filter as health, oauth2::filter as oauth2, hello::filter as hello};
-
-pub fn root(
-    pool: &amp;PgPool,
-    templates: &amp;Templates,
-    config: &amp;RootConfig,
-) -&gt; impl Filter&lt;Extract = (impl Reply,), Error = Rejection&gt; + Clone + Send + Sync + 'static {
-    health(pool)
-        .or(oauth2(pool, templates, &amp;config.oauth2, &amp;config.cookies))
-        // Attach it here, passing the right dependencies
-        .or(hello(pool, templates, &amp;config.cookies))
 }
 <span class="boring">}
 </span></code></pre></pre>
