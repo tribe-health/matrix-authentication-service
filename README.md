@@ -10,6 +10,7 @@ See the [Documentation](https://matrix-org.github.io/matrix-authentication-servi
 - [Install Rust and Cargo](https://www.rust-lang.org/learn/get-started)
 - [Install Node.js and npm](https://nodejs.org/)
 - [Install Open Policy Agent](https://www.openpolicyagent.org/docs/latest/#1-download-opa)
+- [Install PostgreSQL](https://www.postgresql.org/)
 - Clone this repository
 - Generate the frontend:
   ```sh
@@ -27,6 +28,10 @@ See the [Documentation](https://matrix-org.github.io/matrix-authentication-servi
   cd ../../..
   ```
 - Generate the sample config via `cargo run -- config generate > config.yaml`
+- Create DB:
+```sh
+psql postgres -c 'create database element;'
+```
 - Run the database migrations via `cargo run -- database migrate`
 - Run the server via `cargo run -- server -c config.yaml`
 - Go to <http://localhost:8080/>
