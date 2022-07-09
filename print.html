@@ -390,6 +390,32 @@ secrets:
         V4CiFiDQsDX+3znAGxqhTuoOkVn/G5lwgE1cgTX57r9cyYkso9UY
         -----END PRIVATE KEY-----
 </code></pre>
+<h3 id="policy"><a class="header" href="#policy"><code>policy</code></a></h3>
+<p>Policy settings</p>
+<pre><code class="language-yaml">policy:
+  data:
+    admin_users:
+      - person1
+      - person2
+
+    # Dynamic Client Registration
+    client_registration:
+      # don't require URIs to be on the same host. default: false
+      allow_host_mismatch: true
+      # allow non-SSL and localhost URIs. default: false
+      allow_insecure_uris: true
+
+    # Registration using passwords
+    passwords: 
+      # minimum length of a password. default: ?
+      min_length: 8
+      # require at least one lowercase character in a password. default: false
+      require_lowercase: true
+      # require at least one uppercase character in a password. default: false
+      require_uppercase: true
+      # require at least one number in a password. default: false
+      require_number: true
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="using-the-service"><a class="header" href="#using-the-service">Using the service</a></h1>
 <h2 id="running"><a class="header" href="#running">Running</a></h2>
 <p>Once the configuration is done, one should run the database migrations by running</p>
