@@ -85,10 +85,10 @@
                 "playground": true
               },
               {
-                "name": "static"
+                "name": "assets",
+                "path": "./frontend/dist/"
               },
               {
-                "assets": "./frontend/dist/",
                 "manifest": "./frontend/dist/manifest.json",
                 "name": "spa"
               }
@@ -135,7 +135,7 @@
         "client_registration_entrypoint": "client_registration/violation",
         "data": null,
         "register_entrypoint": "register/violation",
-        "wasm_module": null
+        "wasm_module": "./policies/policy.wasm"
       },
       "allOf": [
         {
@@ -171,8 +171,7 @@
     "templates": {
       "description": "Configuration related to templates",
       "default": {
-        "builtin": true,
-        "path": null
+        "path": "./templates/"
       },
       "allOf": [
         {
@@ -1234,7 +1233,7 @@
         },
         "wasm_module": {
           "description": "Path to the WASM module",
-          "default": null,
+          "default": "./policies/policy.wasm",
           "type": "string"
         }
       }
@@ -1402,11 +1401,12 @@
             "name": {
               "type": "string",
               "enum": [
-                "static"
+                "assets"
               ]
             },
-            "web_root": {
-              "description": "Path from which to serve static files. If not specified, it will serve the static files embedded in the server binary",
+            "path": {
+              "description": "Path to the directory to serve.",
+              "default": "./frontend/dist/",
               "type": "string"
             }
           }
@@ -1430,17 +1430,12 @@
           "description": "Mount the single page app",
           "type": "object",
           "required": [
-            "assets",
-            "manifest",
             "name"
           ],
           "properties": {
-            "assets": {
-              "description": "Path to the assets to server",
-              "type": "string"
-            },
             "manifest": {
-              "description": "Path to the vite manifest",
+              "description": "Path to the vite manifest.json",
+              "default": "./frontend/dist/manifest.json",
               "type": "string"
             },
             "name": {
@@ -1511,14 +1506,9 @@
       "description": "Configuration related to templates",
       "type": "object",
       "properties": {
-        "builtin": {
-          "description": "Load the templates embedded in the binary",
-          "default": true,
-          "type": "boolean"
-        },
         "path": {
-          "description": "Path to the folder that holds the custom templates",
-          "default": null,
+          "description": "Path to the folder which holds the templates",
+          "default": "./templates/",
           "type": "string"
         }
       }
