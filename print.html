@@ -330,17 +330,17 @@ secrets:
   builtin: true
 </code></pre>
 <h3 id="clients"><a class="header" href="#clients"><code>clients</code></a></h3>
-<p>List of OAuth 2.0/OIDC clients and their keys/secrets.</p>
+<p>List of OAuth 2.0/OIDC clients and their keys/secrets. Each <code>client_id</code> must be a <a href="https://github.com/ulid/spec">ULID</a>.</p>
 <pre><code class="language-yaml">clients:
   # Confidential client
-  - client_id: first
+  - client_id: 000000000000000000000FIRST
     client_auth_method: clent_secret_post
     client_secret: secret
     # List of authorized redirect URIs
     redirect_uris:
       - http://localhost:1234/callback
   # Public client
-  - client_id: second
+  - client_id: 00000000000000000000SEC0ND
     client_auth_method: none
 </code></pre>
 <h3 id="secrets"><a class="header" href="#secrets"><code>secrets</code></a></h3>
